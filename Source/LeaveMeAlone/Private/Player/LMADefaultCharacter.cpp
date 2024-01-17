@@ -8,6 +8,7 @@
 #include "Components/InputComponent.h"
 #include "Kismet/GameplayStatics.h"
 #include "Kismet/KismetMathLibrary.h"
+#include "Components/LMAHealthComponent.h"
 
 // Sets default values
 ALMADefaultCharacter::ALMADefaultCharacter()
@@ -31,6 +32,8 @@ ALMADefaultCharacter::ALMADefaultCharacter()
     bUseControllerRotationPitch = false;
     bUseControllerRotationYaw = false;
     bUseControllerRotationRoll = false;
+
+    HealthComponent = CreateDefaultSubobject<ULMAHealthComponent>("HealthComponent");
 }
 
 // Called when the game starts or when spawned
@@ -42,13 +45,70 @@ void ALMADefaultCharacter::BeginPlay()
     {
         CurrentCursor = UGameplayStatics::SpawnDecalAtLocation(GetWorld(), CursorMaterial, CursorSize, FVector(0));
     }
+
+    HealthComponent->OnDeath.AddUObject(this, &ALMADefaultCharacter::OnDeath);
+    OnHealthChanged(HealthComponent->GetHealth());
+    HealthComponent->OnHealthChanged.AddUObject(this, &ALMADefaultCharacter::OnHealthChanged);
 }
 
 // Called every frame
 void ALMADefaultCharacter::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
+    if (!(HealthComponent->IsDead()))
+    {
+        RotationPlayerOnCursor();
+    }
+}
 
+// Called to bind functionality to input
+void ALMADefaultCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
+{
+	Super::SetupPlayerInputComponent(PlayerInputComponent);
+
+    PlayerInputComponent->BindAxis("MoveForward", this, &ALMADefaultCharacter::MoveForward);
+    PlayerInputComponent->BindAxis("MoveRight", this, &ALMADefaultCharacter::MoveRight);
+    PlayerInputComponent->BindAxis("CameraZoom", this, &ALMADefaultCharacter::CameraZoom);
+}
+
+void ALMADefaultCharacter::MoveForward(float Value)
+{
+    AddMovementInput(GetActorForwardVector(), Value);
+}
+
+void ALMADefaultCharacter::MoveRight(float Value)
+{
+    AddMovementInput(GetActorRightVector(), Value);
+}
+
+void ALMADefaultCharacter::CameraZoom(float Value)
+{
+    if (Value > 0)
+    {
+        ArmLength -= 100;
+    }
+    else if (Value < 0)
+    {
+        ArmLength += 100;
+    }
+    ArmLength = FMath::Clamp(ArmLength, ArmLengthMin, ArmLengthMax);
+    SpringArmComponent->TargetArmLength = ArmLength;
+}
+
+void ALMADefaultCharacter::OnDeath()
+{
+    CurrentCursor->DestroyRenderState_Concurrent();
+    PlayAnimMontage(DeathMontage);
+    //GetCharacterMovement()->DisableMovement();
+    SetLifeSpan(5.0f);
+    if (IsValid(Controller))
+    {
+        Controller->ChangeState(NAME_Spectating);
+    }
+}
+
+void ALMADefaultCharacter::RotationPlayerOnCursor()
+{
     APlayerController* PC = UGameplayStatics::GetPlayerController(GetWorld(), 0);
     if (IsValid(PC))
     {
@@ -63,44 +123,7 @@ void ALMADefaultCharacter::Tick(float DeltaTime)
     }
 }
 
-// Called to bind functionality to input
-void ALMADefaultCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
+void ALMADefaultCharacter::OnHealthChanged(float NewHealth)
 {
-	Super::SetupPlayerInputComponent(PlayerInputComponent);
-
-    PlayerInputComponent->BindAxis("MoveForward", this, &ALMADefaultCharacter::MoveForward);
-    PlayerInputComponent->BindAxis("MoveRight", this, &ALMADefaultCharacter::MoveRight);
-    PlayerInputComponent->BindAction("CameraZoomIn", EInputEvent::IE_Pressed, this, &ALMADefaultCharacter::CameraZoomIn);
-    PlayerInputComponent->BindAction("CameraZoomOut", EInputEvent::IE_Pressed, this, &ALMADefaultCharacter::CameraZoomOut);
-}
-
-void ALMADefaultCharacter::MoveForward(float Value)
-{
-    //AddMovementInput(GetActorForwardVector(), Value);
-    Value *= 3;
-    AddMovementInput(CameraComponent->GetForwardVector(), Value);
-}
-
-void ALMADefaultCharacter::MoveRight(float Value)
-{
-    //AddMovementInput(GetActorRightVector(), Value);
-    AddMovementInput(CameraComponent->GetRightVector(), Value);
-}
-
-void ALMADefaultCharacter::CameraZoomIn()
-{
-    if (ArmLength > ArmLengthMin)
-    {
-        ArmLength -= 100;
-        SpringArmComponent->TargetArmLength = ArmLength;
-    }
-}
-
-void ALMADefaultCharacter::CameraZoomOut()
-{
-    if (ArmLength < ArmLengthMax)
-    {
-        ArmLength += 100;
-        SpringArmComponent->TargetArmLength = ArmLength;
-    }
+    GEngine->AddOnScreenDebugMessage(-1, 2.0f, FColor::Red, FString::Printf(TEXT("Health = %f"), NewHealth));
 }

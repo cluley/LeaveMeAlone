@@ -8,6 +8,8 @@
 
 class UCameraComponent;
 class USpringArmComponent;
+class ULMAHealthComponent;
+class UAnimMontage;
 
 UCLASS()
 class LEAVEMEALONE_API ALMADefaultCharacter : public ACharacter
@@ -37,6 +39,12 @@ protected:
     UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Cursor")
     FVector CursorSize = FVector(20.0f, 40.0f, 40.0f);
 
+    UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Components|Health")
+    ULMAHealthComponent* HealthComponent;
+
+    UPROPERTY(EditDefaultsOnly, Category = "Animation")
+    UAnimMontage* DeathMontage;
+
 public:	
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
@@ -44,15 +52,20 @@ public:
 	// Called to bind functionality to input
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
 
+    UFUNCTION()
+    ULMAHealthComponent* GetHealthComponent() const { return HealthComponent; }
+
 private:
     float YRotation = -75.0f;
-    float ArmLength = 1400.0f;
-    const float ArmLengthMin = 300.0f;
-    const float ArmLengthMax = 1700.0f;
+    float ArmLength = 1200.0f;
+    const float ArmLengthMin = 400.0f;
+    const float ArmLengthMax = 1600.0f;
     float FOV = 55.0f;
 
 	void MoveForward(float Value);
     void MoveRight(float Value);
-    void CameraZoomIn();
-    void CameraZoomOut();
+    void CameraZoom(float Value);
+    void OnDeath();
+    void RotationPlayerOnCursor();
+    void OnHealthChanged(float NewHealth);
 };
