@@ -2,6 +2,9 @@
 
 
 #include "LevelActors/Pickup/LMAHealthPickup.h"
+#include "Components/SphereComponent.h"
+#include "Player/LMADefaultCharacter.h"
+#include "Components/LMAHealthComponent.h"
 
 // Sets default values
 ALMAHealthPickup::ALMAHealthPickup()

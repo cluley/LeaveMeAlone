@@ -27,20 +27,10 @@ bool ULMAHealthComponent::IsDead() const
     return Health <= KINDA_SMALL_NUMBER;
 }
 
-void ULMAHealthComponent::OnTakeAnyDamage(AActor* DamagedActor, float Damage, const UDamageType* DamageType, AController* InstigatedBy, AActor* DamageCauser)
-{
-    if (IsDead()) return;
-    OnHealthChanged.Broadcast(Health);
-    Health = FMath::Clamp(Health - Damage, 0.0f, MaxHealth);
-    if (IsDead())
-    {
-        OnDeath.Broadcast();
-    }
-}
-
 bool ULMAHealthComponent::AddHealth(float NewHealth)
 {
-    if (IsDead() || IsHealthFull()) return false;
+    if (IsDead() || IsHealthFull())
+        return false;
 
     Health = FMath::Clamp(Health + NewHealth, 0.0f, MaxHealth);
     OnHealthChanged.Broadcast(Health);
@@ -50,4 +40,15 @@ bool ULMAHealthComponent::AddHealth(float NewHealth)
 bool ULMAHealthComponent::IsHealthFull() const
 {
     return FMath::IsNearlyEqual(Health, MaxHealth);
+}
+
+void ULMAHealthComponent::OnTakeAnyDamage(AActor* DamagedActor, float Damage, const UDamageType* DamageType, AController* InstigatedBy, AActor* DamageCauser)
+{
+    if (IsDead()) return;
+    OnHealthChanged.Broadcast(Health);
+    Health = FMath::Clamp(Health - Damage, 0.0f, MaxHealth);
+    if (IsDead())
+    {
+        OnDeath.Broadcast();
+    }
 }

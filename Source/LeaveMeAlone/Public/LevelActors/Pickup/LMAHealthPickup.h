@@ -6,6 +6,8 @@
 #include "GameFramework/Actor.h"
 #include "LMAHealthPickup.generated.h"
 
+class USphereComponent;
+
 UCLASS()
 class LEAVEMEALONE_API ALMAHealthPickup : public AActor
 {
