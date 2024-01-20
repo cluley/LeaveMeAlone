@@ -7,6 +7,7 @@
 #include "LMAHealthPickup.generated.h"
 
 class USphereComponent;
+class ALMADefaultCharacter;
 
 UCLASS()
 class LEAVEMEALONE_API ALMAHealthPickup : public AActor
@@ -27,7 +28,7 @@ protected:
     UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Pickup")
     float RespawnTime = 5.0f;
 
-    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Pickup", meta = (ClampMin = "5.0f", ClampMax = "100.0f"))
+    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Pickup", meta = (ClampMin = 5.0f, ClampMax = 100.0f))
     float HealthFromPickup = 100.0f;
 
     virtual void NotifyActorBeginOverlap(AActor* OtherActor) override;

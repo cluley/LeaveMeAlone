@@ -9,6 +9,7 @@
 #include "Kismet/GameplayStatics.h"
 #include "Kismet/KismetMathLibrary.h"
 #include "Components/LMAHealthComponent.h"
+#include "GameFramework/CharacterMovementComponent.h"
 
 // Sets default values
 ALMADefaultCharacter::ALMADefaultCharacter()
@@ -55,10 +56,13 @@ void ALMADefaultCharacter::BeginPlay()
 void ALMADefaultCharacter::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
+
     if (!(HealthComponent->IsDead()))
     {
         RotationPlayerOnCursor();
     }
+
+    StaminaWorker();
 }
 
 // Called to bind functionality to input
@@ -69,6 +73,8 @@ void ALMADefaultCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInpu
     PlayerInputComponent->BindAxis("MoveForward", this, &ALMADefaultCharacter::MoveForward);
     PlayerInputComponent->BindAxis("MoveRight", this, &ALMADefaultCharacter::MoveRight);
     PlayerInputComponent->BindAxis("CameraZoom", this, &ALMADefaultCharacter::CameraZoom);
+    PlayerInputComponent->BindAction("Sprint", EInputEvent::IE_Pressed, this, &ALMADefaultCharacter::OnSprint);
+    PlayerInputComponent->BindAction("Sprint", EInputEvent::IE_Released, this, &ALMADefaultCharacter::SprintOff);
 }
 
 void ALMADefaultCharacter::MoveForward(float Value)
@@ -79,6 +85,37 @@ void ALMADefaultCharacter::MoveForward(float Value)
 void ALMADefaultCharacter::MoveRight(float Value)
 {
     AddMovementInput(GetActorRightVector(), Value);
+}
+
+void ALMADefaultCharacter::OnSprint()
+{
+    IsSprinting = true;
+    GetCharacterMovement()->MaxWalkSpeed = 750.0f;
+}
+
+void ALMADefaultCharacter::SprintOff()
+{
+    IsSprinting = false;
+    GetCharacterMovement()->MaxWalkSpeed = 300.0f;
+    FTimerHandle RegenTimerHandle;
+}
+
+void ALMADefaultCharacter::StaminaWorker() 
+{
+    if (IsSprinting && Stamina > 0.0f)
+    {
+        Stamina = FMath::Clamp(Stamina - 0.5f, 0.0f, StaminaMax);
+        GEngine->AddOnScreenDebugMessage(-1, 2.0f, FColor::Blue, FString::Printf(TEXT("Stamina = %f"), Stamina));
+    }
+    else if (!IsSprinting && Stamina < StaminaMax)
+    {
+        Stamina = FMath::Clamp(Stamina + 0.4f, 0.0f, StaminaMax);
+        GEngine->AddOnScreenDebugMessage(-1, 2.0f, FColor::Blue, FString::Printf(TEXT("Stamina = %f"), Stamina));
+    }
+    else
+    {
+        SprintOff();
+    }
 }
 
 void ALMADefaultCharacter::CameraZoom(float Value)
@@ -99,7 +136,7 @@ void ALMADefaultCharacter::OnDeath()
 {
     CurrentCursor->DestroyRenderState_Concurrent();
     PlayAnimMontage(DeathMontage);
-    //GetCharacterMovement()->DisableMovement();
+    GetCharacterMovement()->DisableMovement();
     SetLifeSpan(5.0f);
     if (IsValid(Controller))
     {

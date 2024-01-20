@@ -61,9 +61,15 @@ private:
     const float ArmLengthMin = 400.0f;
     const float ArmLengthMax = 1600.0f;
     float FOV = 55.0f;
+    float Stamina = 100.0f;
+    const float StaminaMax = 100.0f;
+    bool IsSprinting = false;
 
 	void MoveForward(float Value);
     void MoveRight(float Value);
+    void OnSprint();
+    void SprintOff();
+    void StaminaWorker();
     void CameraZoom(float Value);
     void OnDeath();
     void RotationPlayerOnCursor();
