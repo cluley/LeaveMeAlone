@@ -27,7 +27,16 @@ protected:
     UPROPERTY()
     ALMABaseWeapon* Weapon = nullptr;
 
+	UPROPERTY(EditDefaultsOnly, Category = "Weapon")
+    UAnimMontage* ReloadMontage;
+
+    bool AnimReloading = false;
+
 public:
 	void SpawnWeapon();
     void Fire();
+    void Reload();
+    void InitAnimNotify();
+    void OnNotifyReloadFinished(USkeletalMeshComponent* SkeletalMesh);
+    bool CanReload() const;
 };
