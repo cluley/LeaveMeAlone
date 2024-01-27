@@ -7,6 +7,7 @@
 #include "LMAWeaponComponent.generated.h"
 
 class ALMABaseWeapon;
+class FTimerManager;
 
 UCLASS( ClassGroup=(Custom), meta=(BlueprintSpawnableComponent) )
 class LEAVEMEALONE_API ULMAWeaponComponent : public UActorComponent
@@ -32,9 +33,12 @@ protected:
 
     bool AnimReloading = false;
 
+    FTimerHandle FireTimerHandle;
+
 public:
 	void SpawnWeapon();
     void Fire();
+    void StopFire();
     void Reload();
     void InitAnimNotify();
     void OnNotifyReloadFinished(USkeletalMeshComponent* SkeletalMesh);

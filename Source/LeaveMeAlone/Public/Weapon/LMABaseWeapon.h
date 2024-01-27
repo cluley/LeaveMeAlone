@@ -6,6 +6,8 @@
 #include "GameFramework/Actor.h"
 #include "LMABaseWeapon.generated.h"
 
+DECLARE_MULTICAST_DELEGATE(FOnNotifyClipEmptySignature);
+
 USTRUCT(BlueprintType)
 struct FAmmoWeapon
 {
@@ -46,12 +48,17 @@ public:
 
     FAmmoWeapon CurrentAmmoWeapon;
 
+    FOnNotifyClipEmptySignature OnNotifyClipEmpty;
+
+    float FireRate = 0.1f;
+
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
     void Fire();
     void Shoot();
     void DecrementBullets();
     bool IsCurrentClipEmpty() const;
+    bool IsCurrentClipFull() const;
     void ChangeClip();
 
 };

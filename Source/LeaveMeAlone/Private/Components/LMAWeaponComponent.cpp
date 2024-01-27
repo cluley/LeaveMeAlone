@@ -5,6 +5,7 @@
 #include "Weapon/LMABaseWeapon.h"
 #include "GameFramework/Character.h"
 #include "Animations/LMAReloadFinishedAnimNotify.h"
+#include "TimerManager.h"
 
 // Sets default values for this component's properties
 ULMAWeaponComponent::ULMAWeaponComponent()
@@ -27,13 +28,14 @@ void ULMAWeaponComponent::BeginPlay()
 void ULMAWeaponComponent::SpawnWeapon()
 {
     Weapon = GetWorld()->SpawnActor<ALMABaseWeapon>(WeaponClass);
-    if (Weapon)
+    if (IsValid(Weapon))
     {
         const auto Character = Cast<ACharacter>(GetOwner());
         if (Character)
         {
             FAttachmentTransformRules AttachmentRules(EAttachmentRule::SnapToTarget, false);
             Weapon->AttachToComponent(Character->GetMesh(), AttachmentRules, "r_Weapon_Socket");
+            Weapon->OnNotifyClipEmpty.AddUObject(this, &ULMAWeaponComponent::Reload);
         }
     }
 }
@@ -43,7 +45,13 @@ void ULMAWeaponComponent::Fire()
     if (IsValid(Weapon) && !AnimReloading)
     {
         Weapon->Fire();
+        GetWorld()->GetTimerManager().SetTimer(FireTimerHandle, Weapon, &ALMABaseWeapon::Fire, Weapon->FireRate, true);
     }
+}
+
+void ULMAWeaponComponent::StopFire()
+{
+    GetWorld()->GetTimerManager().ClearTimer(FireTimerHandle);
 }
 
 void ULMAWeaponComponent::Reload()
@@ -51,6 +59,7 @@ void ULMAWeaponComponent::Reload()
     if (!CanReload()) return;
 
     Weapon->ChangeClip();
+    if (GetWorld()->GetTimerManager().IsTimerActive(FireTimerHandle)) StopFire();
     AnimReloading = true;
     ACharacter* Character = Cast<ACharacter>(GetOwner());
     Character->PlayAnimMontage(ReloadMontage);
@@ -83,5 +92,5 @@ void ULMAWeaponComponent::OnNotifyReloadFinished(USkeletalMeshComponent* Skeleta
 
 bool ULMAWeaponComponent::CanReload() const
 {
-    return !AnimReloading;
+    return !AnimReloading && !Weapon->IsCurrentClipFull();
 }
