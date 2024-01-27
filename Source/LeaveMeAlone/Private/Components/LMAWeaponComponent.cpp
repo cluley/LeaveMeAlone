@@ -35,7 +35,7 @@ void ULMAWeaponComponent::SpawnWeapon()
         {
             FAttachmentTransformRules AttachmentRules(EAttachmentRule::SnapToTarget, false);
             Weapon->AttachToComponent(Character->GetMesh(), AttachmentRules, "r_Weapon_Socket");
-            Weapon->OnNotifyClipEmpty.AddUObject(this, &ULMAWeaponComponent::Reload);
+            Weapon->OnNotifyClipEmpty.AddUObject(this, &ULMAWeaponComponent::ReloadProcess);
         }
     }
 }
@@ -55,6 +55,11 @@ void ULMAWeaponComponent::StopFire()
 }
 
 void ULMAWeaponComponent::Reload()
+{
+    ReloadProcess();
+}
+
+void ULMAWeaponComponent::ReloadProcess()
 {
     if (!CanReload()) return;
 

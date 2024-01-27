@@ -40,6 +40,7 @@ public:
     void Fire();
     void StopFire();
     void Reload();
+    void ReloadProcess();
     void InitAnimNotify();
     void OnNotifyReloadFinished(USkeletalMeshComponent* SkeletalMesh);
     bool CanReload() const;
