@@ -8,6 +8,7 @@
 
 class ALMABaseWeapon;
 class FTimerManager;
+struct FAmmoWeapon;
 
 UCLASS( ClassGroup=(Custom), meta=(BlueprintSpawnableComponent) )
 class LEAVEMEALONE_API ULMAWeaponComponent : public UActorComponent
@@ -36,9 +37,15 @@ protected:
     FTimerHandle FireTimerHandle;
 
 public:
+    UFUNCTION(BlueprintCallable)
+    bool GetCurrentWeaponAmmo(FAmmoWeapon& AmmoWeapon) const;
+
 	void SpawnWeapon();
     void Fire();
+
+    UFUNCTION(BlueprintCallable)
     void StopFire();
+
     void Reload();
     void ReloadProcess();
     void InitAnimNotify();

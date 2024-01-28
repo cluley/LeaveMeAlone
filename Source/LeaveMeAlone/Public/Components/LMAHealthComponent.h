@@ -22,10 +22,10 @@ protected:
 	// Called when the game starts
 	virtual void BeginPlay() override;
 
+public:	
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite)
     float MaxHealth = 100.0f;
 
-public:	
 	UFUNCTION(BlueprintCallable)
     float GetHealth() const { return Health; }
 

@@ -25,6 +25,16 @@ void ULMAWeaponComponent::BeginPlay()
     InitAnimNotify();
 }
 
+bool ULMAWeaponComponent::GetCurrentWeaponAmmo(FAmmoWeapon& AmmoWeapon) const
+{
+    if (IsValid(Weapon))
+    {
+        AmmoWeapon = Weapon->GetCurrentAmmoWeapon();
+        return true;
+    }
+    return false;
+}
+
 void ULMAWeaponComponent::SpawnWeapon()
 {
     Weapon = GetWorld()->SpawnActor<ALMABaseWeapon>(WeaponClass);

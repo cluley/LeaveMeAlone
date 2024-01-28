@@ -54,6 +54,7 @@ public:
 
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
+    FAmmoWeapon GetCurrentAmmoWeapon() const { return CurrentAmmoWeapon; }
     void Fire();
     void Shoot();
     void DecrementBullets();

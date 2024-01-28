@@ -11,6 +11,7 @@
 #include "Components/LMAHealthComponent.h"
 #include "GameFramework/CharacterMovementComponent.h"
 #include "Components/LMAWeaponComponent.h"
+#include "GameFramework/HUD.h"
 
 // Sets default values
 ALMADefaultCharacter::ALMADefaultCharacter()
@@ -167,5 +168,6 @@ void ALMADefaultCharacter::RotationPlayerOnCursor()
 
 void ALMADefaultCharacter::OnHealthChanged(float NewHealth)
 {
+    AHUD* hud = Cast<AHUD>(UGameplayStatics::GetPlayerController(this, 0)->GetHUD());
     GEngine->AddOnScreenDebugMessage(-1, 2.0f, FColor::Red, FString::Printf(TEXT("Health = %f"), NewHealth));
 }
