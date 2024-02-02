@@ -64,8 +64,6 @@ void ALMADefaultCharacter::Tick(float DeltaTime)
     {
         RotationPlayerOnCursor();
     }
-
-    StaminaWorker();
 }
 
 // Called to bind functionality to input
@@ -95,33 +93,36 @@ void ALMADefaultCharacter::MoveRight(float Value)
 
 void ALMADefaultCharacter::OnSprint()
 {
-    IsSprinting = true;
-    GetCharacterMovement()->MaxWalkSpeed = 750.0f;
+    if (GetVelocity().Length() > 299.0f)
+    {
+        GetCharacterMovement()->MaxWalkSpeed = 750.0f;
+        GetWorld()->GetTimerManager().SetTimer(StaminaTimerHandle, this, &ALMADefaultCharacter::DrainStamina, 0.05f, true);
+    }
 }
 
 void ALMADefaultCharacter::SprintOff()
 {
-    IsSprinting = false;
     GetCharacterMovement()->MaxWalkSpeed = 300.0f;
-    FTimerHandle RegenTimerHandle;
+    GetWorld()->GetTimerManager().ClearTimer(StaminaTimerHandle);
+    GetWorld()->GetTimerManager().SetTimer(StaminaTimerHandle, this, &ALMADefaultCharacter::RegenStamina, 0.05f, true);
 }
 
-void ALMADefaultCharacter::StaminaWorker() 
+void ALMADefaultCharacter::DrainStamina()
 {
-    if (IsSprinting && Stamina > 0.0f)
-    {
-        Stamina = FMath::Clamp(Stamina - 0.5f, 0.0f, StaminaMax);
-        GEngine->AddOnScreenDebugMessage(-1, 2.0f, FColor::Blue, FString::Printf(TEXT("Stamina = %f"), Stamina));
-    }
-    else if (!IsSprinting && Stamina < StaminaMax)
-    {
-        Stamina = FMath::Clamp(Stamina + 0.4f, 0.0f, StaminaMax);
-        GEngine->AddOnScreenDebugMessage(-1, 2.0f, FColor::Blue, FString::Printf(TEXT("Stamina = %f"), Stamina));
-    }
-    else
+    Stamina = FMath::Clamp(Stamina - 2.0f, 0.0f, StaminaMax);
+    if (Stamina < 0.001 || GetVelocity().Length() < 299.0f)
     {
         SprintOff();
     }
+}
+
+void ALMADefaultCharacter::RegenStamina()
+{
+    if (Stamina == StaminaMax)
+    {
+        GetWorld()->GetTimerManager().ClearTimer(StaminaTimerHandle);
+    }
+    Stamina = FMath::Clamp(Stamina + 1.6f, 0.0f, StaminaMax);
 }
 
 void ALMADefaultCharacter::CameraZoom(float Value)
@@ -168,6 +169,5 @@ void ALMADefaultCharacter::RotationPlayerOnCursor()
 
 void ALMADefaultCharacter::OnHealthChanged(float NewHealth)
 {
-    AHUD* hud = Cast<AHUD>(UGameplayStatics::GetPlayerController(this, 0)->GetHUD());
-    GEngine->AddOnScreenDebugMessage(-1, 2.0f, FColor::Red, FString::Printf(TEXT("Health = %f"), NewHealth));
+    HealthChangedNotify();
 }

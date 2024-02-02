@@ -59,21 +59,29 @@ public:
     UFUNCTION()
     ULMAHealthComponent* GetHealthComponent() const { return HealthComponent; }
 
+    UFUNCTION(BlueprintImplementableEvent)
+    void HealthChangedNotify();
+
+    UPROPERTY(EditDefaultsOnly, BlueprintReadWrite)
+    float Stamina = 100.0f;
+
+    UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
+    float StaminaMax = 100.0f;
+
 private:
     float YRotation = -75.0f;
     float ArmLength = 1200.0f;
     const float ArmLengthMin = 400.0f;
     const float ArmLengthMax = 1600.0f;
     float FOV = 55.0f;
-    float Stamina = 100.0f;
-    const float StaminaMax = 100.0f;
-    bool IsSprinting = false;
+    FTimerHandle StaminaTimerHandle;
 
 	void MoveForward(float Value);
     void MoveRight(float Value);
     void OnSprint();
     void SprintOff();
-    void StaminaWorker();
+    void DrainStamina();
+    void RegenStamina();
     void CameraZoom(float Value);
     void OnDeath();
     void RotationPlayerOnCursor();

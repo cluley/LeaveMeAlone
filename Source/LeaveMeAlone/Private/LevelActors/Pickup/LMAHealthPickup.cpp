@@ -43,10 +43,14 @@ void ALMAHealthPickup::NotifyActorBeginOverlap(AActor* OtherActor)
 
 bool ALMAHealthPickup::GivePickup(ALMADefaultCharacter* Character)
 {
-    const auto HealthComponent = Character->GetHealthComponent();
-    if (!HealthComponent) return false;
+    if (IsValid(Character))
+    {
+        const auto HealthComponent = Character->GetHealthComponent();
+        if (!IsValid(HealthComponent)) return false;
+        return HealthComponent->AddHealth(HealthFromPickup);
+    }
 
-    return HealthComponent->AddHealth(HealthFromPickup);
+    return false;
 }
 
 void ALMAHealthPickup::PickupWasTaken()

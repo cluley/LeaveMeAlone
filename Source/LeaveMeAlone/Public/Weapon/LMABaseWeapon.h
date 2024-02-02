@@ -23,6 +23,9 @@ struct FAmmoWeapon
     bool Infinite;
 };
 
+class USoundWave;
+class UNiagaraSystem;
+
 UCLASS()
 class LEAVEMEALONE_API ALMABaseWeapon : public AActor
 {
@@ -52,6 +55,15 @@ public:
 
     float FireRate = 0.1f;
 
+    UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Weapon")
+    USoundWave* ShootWave;
+
+    UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Weapon")
+    UNiagaraSystem* TraceEffect;
+
+    UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Weapon")
+    FString TraceName = "Tracer";
+
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
     FAmmoWeapon GetCurrentAmmoWeapon() const { return CurrentAmmoWeapon; }
@@ -61,5 +73,5 @@ public:
     bool IsCurrentClipEmpty() const;
     bool IsCurrentClipFull() const;
     void ChangeClip();
-
+    void SpawnTrace(const FVector& TraceStart, const FVector& TraceEnd);
 };
