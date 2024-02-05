@@ -63,6 +63,9 @@ public:
 
     UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Weapon")
     FString TraceName = "Tracer";
+    
+    UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Weapon")
+    float Damage = 20;
 
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
@@ -74,4 +77,5 @@ public:
     bool IsCurrentClipFull() const;
     void ChangeClip();
     void SpawnTrace(const FVector& TraceStart, const FVector& TraceEnd);
+    void MakeDamage(const FHitResult& HitResult);
 };

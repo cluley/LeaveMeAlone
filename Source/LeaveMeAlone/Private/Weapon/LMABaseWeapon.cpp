@@ -49,6 +49,7 @@ void ALMABaseWeapon::Shoot()
     FVector TracerEnd = TraceEnd;
     if (HitResult.bBlockingHit)
     {
+        MakeDamage(HitResult);
         TracerEnd = HitResult.ImpactPoint;
     }
 
@@ -89,4 +90,18 @@ void ALMABaseWeapon::SpawnTrace(const FVector& TraceStart, const FVector& TraceE
     {
         TraceFX->SetNiagaraVariableVec3(TraceName, TraceEnd);
     }
+}
+
+void ALMABaseWeapon::MakeDamage(const FHitResult& HitResult)
+{
+    const auto Zombie = HitResult.GetActor();
+    if (!IsValid(Zombie)) return;
+
+    const auto Pawn = UGameplayStatics::GetPlayerPawn(GetWorld(), 0);
+    if (!IsValid(Pawn)) return;
+
+    const auto Controller = Pawn->GetController<APlayerController>();
+    if (!IsValid(Controller)) return;
+
+    Zombie->TakeDamage(Damage, FDamageEvent(), Controller, this);
 }
