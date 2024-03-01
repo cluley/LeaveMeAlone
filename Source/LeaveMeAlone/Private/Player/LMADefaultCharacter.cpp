@@ -60,7 +60,7 @@ void ALMADefaultCharacter::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 
-    if (!(HealthComponent->IsDead()))
+    if (!(HealthComponent->IsDead()) && !IsSprinting)
     {
         RotationPlayerOnCursor();
     }
@@ -83,28 +83,47 @@ void ALMADefaultCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInpu
 
 void ALMADefaultCharacter::MoveForward(float Value)
 {
-    AddMovementInput(GetActorForwardVector(), Value);
+    if (!IsSprinting)
+    {
+        AddMovementInput(FVector(1.0f, 0.0f, 0.0f), Value);
+    }
+    else
+    {
+        SetActorRotation(FQuat(FRotator(GetVelocity().Rotation())));
+        AddMovementInput(FVector(1.0f, 0.0f, 0.0f), Value);
+    }
 }
 
 void ALMADefaultCharacter::MoveRight(float Value)
 {
-    AddMovementInput(GetActorRightVector(), Value);
+    if (!IsSprinting)
+    {
+        AddMovementInput(FVector(0.0f, 1.0f, 0.0f), Value);
+    }
+    else
+    {
+        SetActorRotation(FQuat(FRotator(GetVelocity().Rotation())));
+        AddMovementInput(FVector(0.0f, 1.0f, 0.0f), Value);
+    }
 }
 
 void ALMADefaultCharacter::OnSprint()
 {
     if (GetVelocity().Length() > 299.0f)
     {
+        IsSprinting = true;
         GetCharacterMovement()->MaxWalkSpeed = 750.0f;
-        GetWorld()->GetTimerManager().SetTimer(StaminaTimerHandle, this, &ALMADefaultCharacter::DrainStamina, 0.05f, true);
+        GetWorld()->GetTimerManager().SetTimer(StaminaTimerHandle, this, &ALMADefaultCharacter::DrainStamina, 0.07f, true);
+        SetActorRotation(FQuat(FRotator(GetVelocity().Rotation())));
     }
 }
 
 void ALMADefaultCharacter::SprintOff()
 {
+    IsSprinting = false;
     GetCharacterMovement()->MaxWalkSpeed = 300.0f;
     GetWorld()->GetTimerManager().ClearTimer(StaminaTimerHandle);
-    GetWorld()->GetTimerManager().SetTimer(StaminaTimerHandle, this, &ALMADefaultCharacter::RegenStamina, 0.05f, true);
+    GetWorld()->GetTimerManager().SetTimer(StaminaTimerHandle, this, &ALMADefaultCharacter::RegenStamina, 0.07f, true);
 }
 
 void ALMADefaultCharacter::DrainStamina()

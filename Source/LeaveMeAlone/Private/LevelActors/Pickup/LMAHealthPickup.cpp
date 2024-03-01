@@ -22,6 +22,7 @@ void ALMAHealthPickup::BeginPlay()
 {
 	Super::BeginPlay();
 	
+    PickupWasTaken();
 }
 
 // Called every frame
@@ -65,4 +66,6 @@ void ALMAHealthPickup::RespawnPickup()
 {
     SphereComponent->SetCollisionResponseToAllChannels(ECollisionResponse::ECR_Overlap);
     GetRootComponent()->SetVisibility(true, true);
+    FTimerHandle DisposeTimerHandle;
+    GetWorldTimerManager().SetTimer(DisposeTimerHandle, this, &ALMAHealthPickup::PickupWasTaken, BeingDuration);
 }

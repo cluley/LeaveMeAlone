@@ -16,7 +16,7 @@ void ULMAHealthComponent::BeginPlay()
     Health = MaxHealth;
     OnHealthChanged.Broadcast(Health);
     AActor* OwnerComponent = GetOwner();
-    if (OwnerComponent)
+    if (IsValid(OwnerComponent))
     {
         OwnerComponent->OnTakeAnyDamage.AddDynamic(this, &ULMAHealthComponent::OnTakeAnyDamage);
     }

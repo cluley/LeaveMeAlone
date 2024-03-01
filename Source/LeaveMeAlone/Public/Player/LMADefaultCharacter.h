@@ -75,6 +75,7 @@ private:
     const float ArmLengthMax = 1600.0f;
     float FOV = 55.0f;
     FTimerHandle StaminaTimerHandle;
+    bool IsSprinting = false;
 
 	void MoveForward(float Value);
     void MoveRight(float Value);
