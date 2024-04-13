@@ -6,7 +6,7 @@
 #include "GameFramework/Actor.h"
 #include "LMADamageActor.generated.h"
 
-class USphereComponent;
+class UCapsuleComponent;
 
 UCLASS()
 class LEAVEMEALONE_API ALMADamageActor : public AActor
@@ -22,7 +22,7 @@ protected:
 	virtual void BeginPlay() override;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Components")
-    USphereComponent* SphereComponent;
+    UCapsuleComponent* CapsuleComponent;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Components")
     UStaticMeshComponent* StaticMesh;
@@ -31,7 +31,7 @@ protected:
     float Damage = 5.0f;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Damage")
-    float SphereRadius = 100.0f;
+    float CapsuleRadius = 100.0f;
 
 public:	
 	// Called every frame

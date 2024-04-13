@@ -3,6 +3,7 @@
 
 #include "Player/LMADefaultCharacter.h"
 #include "Camera/CameraComponent.h"
+#include "Components/DamageCameraShake.h"
 #include "GameFramework/SpringArmComponent.h"
 #include "Components/DecalComponent.h"
 #include "Components/InputComponent.h"
